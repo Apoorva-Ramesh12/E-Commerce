@@ -7,18 +7,23 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 
 // place order from cart
-router.post('/place', auth, async (req, res) => {
-  const user = await User.findById(req.user._id).populate('cart.product');
-  if (!user.cart.length) return res.status(400).json({ msg: 'Cart empty' });
+router.post("/", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { items } = req.body; // items = [{ productId, quantity }]
 
-  let total = 0;
-  const items = [];
+    if (!items || items.length === 0)
+      return res.status(400).json({ msg: "No items to order" });
+    const user = await User.findById(userId).populate('cart.product');
+
+    let orderItems = [];
+    let total = 0;
 
   // simple stock check and total calculation
   for (const c of user.cart) {
     const p = c.product;
     if (p.stock < c.qty) return res.status(400).json({ msg: `Insufficient stock for ${p.name}` });
-    items.push({ product: p._id, qty: c.qty, priceAtPurchase: p.price });
+    orderItems.push({ product: p._id, qty: c.qty, priceAtPurchase: p.price });
     total += p.price * c.qty;
   }
 
@@ -35,6 +40,10 @@ router.post('/place', auth, async (req, res) => {
   await user.save();
 
   res.json(order);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // get my orders

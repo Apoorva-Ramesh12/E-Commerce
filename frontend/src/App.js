@@ -12,8 +12,8 @@ function Landing() {
   return (
     <div className="center">
       <h1>Simple E-Commerce Website</h1>
-      <button onClick={() => navigate("/login")}>Login</button>
-      <button onClick={() => navigate("/signup")} style={{ marginLeft: 10 }}>Signup</button>
+      <button align="center"  onClick={() => navigate("/login")}>Login</button>
+      <button align="center" onClick={() => navigate("/signup")} style={{ marginLeft: 10 }}>Signup</button>
     </div>
   );
 }
